@@ -1,0 +1,82 @@
+{% extends 'myadmin/index.html' %}
+{% load tags %}
+
+{% block right-content %}
+    <h3 class="page-header">table_detail</h3>
+    <div>
+        <p class="bg-primary" style="font-size: 20px"></p>
+        {#        {{ querysets }}#}
+        <!-- search -->
+        {% if admin_class.search_fields %}
+            <form class="form-inline">
+                <input type="search" placeholder="{% for s in admin_class.search_fields %}{{ s }},{% endfor %}" name="_q" value="{% if admin_class.search_val %}{{ admin_class.search_val }}{% else %}{{ '' }}{% endif %}">
+                <input type="submit" class="btn btn-primary" value="Search"/>
+                <!--提交过滤条件-->
+                {% for k,v in admin_class.filter_condtions.items %}
+                    <input type="hidden" name="{{ k }}" value="{{ v }}">
+                {% endfor %}
+            </form>
+        {% endif %}
+        <!-- filter -->
+        {% if admin_class.list_filter %}
+            <form class="form-inline">
+                {% for filter_column in admin_class.list_filter %}
+                    {% build_filter_ele filter_column admin_class %}
+                {% endfor %}
+                <input type="submit" class="btn btn-success" value="筛选"/>
+
+                <input class="hidden" type="text" name="_o" value="{% combined_url_o admin_class %}"/>
+                <input class="hidden" type="text" name="_q" value="{% if admin_class.search_val %}{{ admin_class.search_val }}{% else %}{{ '' }}{% endif %}"/>
+            </form>
+        {% endif %}
+
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                {% if admin_class.list_display %}
+                    {% for col_index,col_name in admin_class.list_display|sorted_list_display %}
+                        <th>
+                        <!-- sort -->
+                            <a href="?_o={% get_sorted_column col_index admin_class sort_col_index %}{% combined_url_args admin_class '_o' %}">
+                                {{ col_name }}
+                                {% render_sorted_arrow col_index sort_col_index %}
+                            </a>
+                        </th>
+                    {% endfor %}
+                {% else %}
+                    <th>{% get_model_name admin_class %}</th>
+                {% endif %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for row_obj in querysets %}
+                {#                        <tr>{{ row_obj }}</tr>#}
+                <tr>{% col_data_display row_obj admin_class %}</tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="pagination">
+            {% render_paginator querysets admin_class %}
+
+            <span class="step-links">
+                {% if querysets.has_previous %}
+                    <a href="?_page=1">&laquo; first</a>
+                    <a href="?_page={{ querysets.previous_page_number }}">previous</a>
+                {% endif %}
+
+                <span class="current">
+                    Page {{ querysets.number }} of {{ querysets.paginator.num_pages }}.
+                </span>
+
+                {% if querysets.has_next %}
+                    <a href="?_page={{ querysets.next_page_number }}">next</a>
+                    <a href="?_page={{ querysets.paginator.num_pages }}">last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+
+    </div>
+
+
+{% endblock %}

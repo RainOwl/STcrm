@@ -1,0 +1,13 @@
+{% extends 'myadmin/index.html' %}
+{% load tags %}
+
+{% block right-content %}
+    <h3 class="page-header">table_obj_add</h3>
+    <p class="bg-primary" style="font-size: 20px">ADD--{% get_model_name admin_class %}</p>
+    <div class="col-sm-10">
+        {#        {{ form_obj }}#}
+        {% include 'myadmin/table_obj_chage_extra.html' %}
+    </div>
+
+
+{% endblock %}

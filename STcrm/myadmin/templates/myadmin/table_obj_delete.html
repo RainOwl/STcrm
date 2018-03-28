@@ -1,0 +1,24 @@
+{% extends 'myadmin/index.html' %}
+{% load tags %}
+
+{% block right-content %}
+    <!--<h3 class="page-header">table_obj_delete</h3>-->
+    <h2 class="page-header">Delete--{% get_model_name admin_class %}</h2>
+    <h3><p class="bg-danger">注意:以下与[ {{ obj }} ]相关联的数据都将被删除!</p></h3>
+    <div>
+    {% display_all_related_objs obj as all_related_obj_eles %}
+    {{ all_related_obj_eles | safe }}
+    </div>
+
+    <form method="post">{% csrf_token %}
+        <div class="submit-row">
+            <div class="col-sm-offset-1 col-sm-10">
+                <button type="submit" class="btn btn-danger" style="float: left"> Confirm Delete </button>
+                <p>
+                    <a  class="btn btn-info col-sm-offset-2" href="#"> Back </a>
+                </p>
+            </div>
+        </div>
+    </form>
+
+{% endblock %}

@@ -1,0 +1,103 @@
+{% load tags %}
+{{ form_obj.errors }}
+<form class="form-horizontal" method="post" onsubmit="VerificationBeforeFormSubmit()">{% csrf_token %}
+    {% for form_item in form_obj %}
+        <div class="form-group">
+            <label for="inputEmail3" class="col-sm-2 control-label">{{ form_item.label }}</label>
+            <div class="col-sm-10">
+                {% if form_item.name in admin_class.filter_horizontal %}
+                    <div class="col-lg-5">
+                        <p class="selector-filter">
+                            <span class="glyphicon glyphicon-search" style="float: left;margin: 7px 4px 0px"
+                                  aria-hidden="true"></span>
+                            <input type="search" class="form-control" style="width: 320px; margin-left: 8px"
+                                   oninput="FuzzSearch(this)">
+                        </p>
+                        <select multiple style="width: 380px; min-height: 150px" id="target_from">
+                            {% get_available_m2m_data admin_class form_obj form_item.name as get_available_m2m_data %}
+                            {% for i in get_available_m2m_data %}
+                                <option value="{{ i.id }}"
+                                        ondblclick="MoveSelectedOption(this,'target_to')">{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="col-sm-offset-5">
+                            <a onclick="MoveAllSelectedOption('target_from', 'target_to')">Choose All</a><span
+                                class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-5">
+                        <!--自定义标签需设置name-->
+                        <select multiple style="width: 380px; min-height: 150px" id="target_to"
+                                name="{{ form_item.name }}">
+                            {% get_selected_m2m_data form_obj form_item.name as get_selected_m2m_data %}
+                            {% for i in get_selected_m2m_data %}
+                                <option value="{{ i.id }}"
+                                        ondblclick="MoveSelectedOption(this,'target_from')">{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="col-sm-offset-5">
+                            <a onclick="MoveAllSelectedOption('target_to','target_from')">Remove All</a><span
+                                class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                {% else %}
+                    {{ form_item }}
+                {% endif %}
+                <span style="color: red">{{ form_item.errors.0 }}</span></div>
+        </div>
+    {% endfor %}
+
+    <!--编辑状态下，readonly_fields字段为只读模式,显示P标签-->
+    {% if not admin_class.form_add %}
+        {% for field in admin_class.readonly_fields %}
+            <div class="form-group">
+                <label class="col-sm-2 control-label">{{ field }}</label>
+                <div class="col-sm-10">
+                    <p class="form-control-static">{% get_obj_field_val admin_class form_obj field %}</p>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="submit-row">
+        <div class="col-sm-offset-2 col-sm-10">
+            <p class="" style="float: left">
+                <a  class="btn btn-danger" href="{% url 'table_obj_delete' app_name model_name form_obj.instance.id %}"> Delete </a>
+            </p>
+            <button type="submit" class="btn btn-primary col-sm-offset-9"> Save </button>
+        </div>
+    </div>
+</form>
+
+<script>
+    function MoveSelectedOption(ths, to) {
+        var target_name = $(ths).parent().prop('id');
+        //console.log(target_name);
+        $(ths).appendTo($('#' + to));
+        $('#' + to).children().last().attr('ondblclick',"MoveSelectedOption(this,'"+target_name+"')")
+    };
+    function VerificationBeforeFormSubmit() {
+        $('#target_to').children().each(function () {
+            $(this).prop('selected', true);
+        })
+    };
+    function MoveAllSelectedOption(from, to) {
+        var target_name = $('#' + from).prop('id');
+        $('#' + from).children().each(function () {
+            $(this).attr('ondblclick',"MoveSelectedOption(this,'"+target_name+"')");
+            $(this).appendTo($('#' + to));
+        })
+    };
+    function FuzzSearch(ths) {
+        var search_text = $(ths).val().toUpperCase();
+        $('#target_from').children().each(function () {
+            if ($(this).text().toUpperCase().search(search_text) != -1){
+                $(this).show();
+            }else {
+                $(this).hide();
+            }
+        })
+    }
+
+</script>

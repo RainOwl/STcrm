@@ -1,0 +1,26 @@
+{% extends 'self_index.html' %}
+{% block extra-css %}
+    <link rel="stylesheet" href="/static/css/signincss.css">
+{% endblock %}
+
+{% block body %}
+
+    <div class="container">
+
+        <form class="form-signin" method="post">{% csrf_token %}
+            <h2 class="form-signin-heading">MyAdmin sign in</h2>
+            <label for="inputUsername" class="sr-only">Username</label>
+            <input name="username" type="text" id="inputUsername" class="form-control" placeholder="Username" required autofocus>
+            <label for="inputPassword" class="sr-only">Password</label>
+            <input name="password" type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+            <span style="color: red">{{ error_msg }}</span>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" value="remember-me"> Remember me
+                </label>
+            </div>
+            <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+        </form>
+
+    </div>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends 'myadmin/index.html' %}
+
+{% block right-content %}
+    <h3 class="page-header">app_index</h3>
+{#    {{ pro_model_admin }}#}
+
+    <div>
+        {% for pro,item in pro_model_admin.items %}
+        <p class="bg-primary" style="font-size: 20px">{{ pro }}</p>
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>table-name</th>
+                    <th>admin-name</th>
+                    <th>opration</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for model_name, admin_name in item.items %}
+                <tr>
+                    <td><a href="{% url 'table_detail' pro model_name %}">{{ model_name }}</a></td>
+                    <td><a href="#">{{ admin_name }}</a></td>
+                    <td><a href="{% url 'table_obj_add' pro model_name %}">Add</a> | Change</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        {% endfor %}
+    </div>
+
+
+{% endblock %}
